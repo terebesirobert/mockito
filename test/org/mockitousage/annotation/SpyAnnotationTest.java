@@ -15,7 +15,8 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"unchecked", "unused"})
 public class SpyAnnotationTest extends TestBase {
@@ -26,6 +27,18 @@ public class SpyAnnotationTest extends TestBase {
 
     @Spy
     NestedClassWithoutDefinedConstructor staticTypeWithoutDefinedConstructor;
+
+    @Spy PrivateClass privateClass;
+    @Spy PrivateClass privateInnerClass;
+
+    @Test
+    public void privateClasses() throws Exception {
+        when(privateClass.toString()).thenReturn("x");
+        when(privateInnerClass.toString()).thenReturn("y");
+
+        assertEquals("x", privateClass.toString());
+        assertEquals("y", privateInnerClass.toString());
+    }
 
 	@Test
     public void shouldInitSpies() throws Exception {
@@ -118,6 +131,10 @@ public class SpyAnnotationTest extends TestBase {
     public void shouldResetSpies() throws Exception {
         spiedList.get(10); // see shouldInitSpy
     }
+
+    static class PrivateClass {}
+
+    static class PrivateInnerClass {}
 
     static class NestedClassWithoutDefinedConstructor { }
 

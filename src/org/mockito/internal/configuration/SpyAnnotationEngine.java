@@ -62,10 +62,17 @@ public class SpyAnnotationEngine implements AnnotationEngine {
                         Mockito.reset(instance);
                     } else {
                         field.setAccessible(true);
-                        field.set(testInstance, Mockito.mock(instance.getClass(), withSettings()
-                                .spiedInstance(instance)
-                                .defaultAnswer(Mockito.CALLS_REAL_METHODS)
-                                .name(field.getName())));
+                        if (field.get(testInstance) != null) {
+                            field.set(testInstance, Mockito.mock(field.get(testInstance).getClass(), withSettings()
+                                    .defaultAnswer(Mockito.CALLS_REAL_METHODS)
+                                    .spiedInstance(field.get(testInstance))
+                                    .name(field.getName())));
+                        } else {
+                            field.set(testInstance, Mockito.mock(field.getType(), withSettings()
+                                    .defaultAnswer(Mockito.CALLS_REAL_METHODS)
+                                    .useConstructor()
+                                    .name(field.getName())));
+                        }
                     }
                 } catch (IllegalAccessException e) {
                     throw new MockitoException("Problems initiating spied field " + field.getName(), e);
